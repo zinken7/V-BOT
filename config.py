@@ -15,6 +15,7 @@ class Config(object):
     ALLOWED_EXTENSIONS = {'csv', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp4'}
     
     DOWNLOAD_FILE = join(dirname(realpath(__file__)), 'app/static/downloads')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class ProductionConfig(Config):
     DEBUG = False
@@ -46,8 +47,6 @@ class DebugConfig(Config):
         config( 'DB_PORT'     , default=5432            ),
         config( 'DB_NAME'     , default='fb-dev'        )
     )
-
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 # Load all possible configurations
