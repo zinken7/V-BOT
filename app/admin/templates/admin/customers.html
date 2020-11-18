@@ -1,0 +1,77 @@
+{% extends "admin/layouts.html" %}
+{% block title %} Khách hàng {% endblock title %}
+{% block stylesheets %}{% endblock stylesheets %}
+{% block content %}
+{% include "admin/components/navigation.html" %}
+        <!-- Header -->
+        <div class="header bg-primary pb-6">
+            <div class="container-fluid">
+                <div class="header-body">
+                    <div class="row align-items-center py-4">
+                        <div class="col-lg-6 col-7">
+                            <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                                <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                                    <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                                    <li class="breadcrumb-item"><a href="#">Khách hàng</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Danh sách khách hàng</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid mt--6" id="app">
+            <!-- Table -->
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <!-- Card header -->
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">Note:</h3>
+                                    <p class="text-sm mb-0">
+                                        Tải lên tệp khách hàng "customer.csv" trước khi Upload...
+                                    </p>
+                                </div>
+                                <div class="col text-right">
+                                    <button class="btn btn-primary" id="upload-cus" @click.prevent="uploadCsv">Upload</button>
+                                    <button class="btn btn-primary" id="download-cus" @click.prevent="downloadCsv">Download</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <div>
+                                <table class="table align-items-center">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">UID</th>
+                                            <th scope="col">TRIGGERED</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="list">
+                                        {% for item in data %}
+                                        <tr>
+                                            <td class="id">{{ item.id }}</td>
+                                            <td class="uid">{{ item.uid }}</td>
+                                            <td class="triggered">{{ item.triggered }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer -->
+            {% include "admin/components/footer.html" %}
+            <notifications group="notification" position="top right" classes="my-notification" width="300"/>
+        </div>
+{% endblock content %}
+{% block javascripts %}
+    <script src="{{ url_for('admin_blueprint.static', filename='assets/js/customer.min.js') }}"></script>
+{% endblock javascripts %}

@@ -1,0 +1,100 @@
+{% extends "admin/layouts.html" %}
+{% block title %} Cấu hình {% endblock title %}
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+{% include "admin/components/navigation.html" %}
+<!-- Header -->
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="#">Cấu hình</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Danh sách Cấu hình</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid mt--6" id="app">
+    <!-- Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="mb-0">Cài đặt tài khoản</h3>
+                            <p class="text-sm mb-0">
+                                Đăng nhập vào tài khoản Facebook có quyền quản trị rồi chọn trang để kết nối.
+                            </p>
+                        </div>
+                        <div class="col-sm-4 pad-all">
+                            <v-facebook-login app-id="{{ appID | safe }}" version="v{{ version | safe }}" :login-options="lgoptions"
+                                v-model="model" @sdk-init="handleSdkInit" style="cursor: pointer;">
+                            </v-facebook-login>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mb-3">
+                            <h3 class="mb-0">Danh sách Page:</h3>
+                            <p class="text-sm mb-0">
+                                Những trang đã cấp quyền sẽ xuất hiện ở đây, bạn phải reset thông tin trang trước khi thay đổi lựa chọn kết nối trang.
+                            </p>
+                        </div>
+                        <div class="col pad-all">
+                            <button @click="getListPage" type="button" class="btn btn-sm btn-outline-info">Lấy danh sách
+                                Page</button>
+                            <button @click="deletePage" type="button" class="btn btn-sm btn-outline-danger">Reset thông tin trang</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-body beauty-box">
+                                <ul class="list-group list-group-flush list">
+                                    <li v-for="(page, index) in listPages" :key="page.uid" class="list-group-item">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <!-- Avatar -->
+                                                <a href="#" class="avatar rounded-circle">
+                                                    <img alt="Image placeholder" :src="page.avatar">
+                                                </a>
+                                            </div>
+                                            <div class="col ml--2">
+                                                <h4 class="mb-0">[[ page.name ]]</h4>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button v-if="page.selected" type="button"
+                                                    class="btn btn-secondary" disabled>Đã kết nối</button>
+                                                <button v-else @click="sendPageUID(index)" type="button" class="btn btn-primary">Kết nối
+                                                    Page</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    {% include "admin/components/footer.html" %}
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script
+    src="{{ url_for('admin_blueprint.static', filename='assets/vendor/vueFacebookLogin/vueFacebookLoginComponent.umd.min.js') }}">
+</script>
+<script src="{{ url_for('admin_blueprint.static', filename='assets/js/setting.min.js') }}"></script>
+{% endblock javascripts %}

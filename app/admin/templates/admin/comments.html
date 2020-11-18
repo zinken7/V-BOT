@@ -1,0 +1,68 @@
+{% extends "admin/layouts.html" %}
+{% block title %} Bình luận {% endblock title %}
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+{% include "admin/components/navigation.html" %}
+<!-- Header -->
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="#">Bình luận</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Danh sách bình luận</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid mt--6" id="app">
+    <!-- Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header bg-secondary">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="mb-0">Bình luận</h3>
+                            <p class="text-sm mb-0">
+                                Random câu trả lời dựa trên danh sách bình luận... Thay fullname bằng @@
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div v-for="(val, ind) in coments" :key="ind" class="row">
+                        <div class="col">
+                            <label class="form-control-label pad-right" for="basic-url">Bình luận [[ ind+1 ]]</label>
+                            <div class="form-group pad-all">
+                                <textarea v-model="val.value" @change="updateData(ind)" class="form-control mag-right"></textarea>
+                                <button type="button" class="btn btn-danger" @click="deleteQues(ind, val.id)">
+                                    <span class="btn-inner--text">Xóa</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-icon btn-block btn-secondary" type="button" @click="addNewQues">
+                        <span class="btn-inner--icon"><i class="ni ni-fat-add"></i></span>
+                        <span class="btn-inner--text">Thêm bình luận</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    {% include "admin/components/footer.html" %}
+    <notifications group="notification" position="top right" classes="my-notification" width="250" />
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="{{ url_for('admin_blueprint.static', filename='assets/js/comment.min.js') }}"></script>
+{% endblock javascripts %}

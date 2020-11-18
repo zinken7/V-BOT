@@ -1,0 +1,62 @@
+{% extends "admin/layouts.html" %}
+{% block title %} Dashboard {% endblock title %}
+{% block stylesheets %}
+{{ super() }}
+{% endblock stylesheets %}
+{% block content %}
+{% include "admin/components/navigation.html" %}
+    <!-- Header -->
+    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-5">
+      <div class="container-fluid">
+        <div class="header-body">
+          <!-- Card stats -->
+          <div class="row">
+            <div class="col">
+                <div class="card card-stats mb-4 mb-xl-0">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col">
+                        <span>Một sản phẩm của Multiple Technological Developed Transition Services(MTDT Services)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<div class="container-fluid mt--7" id="app">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">Trang chủ</h6>
+                            <h2 class="mb-0">Hướng dẫn sử dụng</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="content">
+                        <p class="mb-0 text-sm">
+                            <span class="text-nowrap">Tự động reply khách hàng theo kịch bản, ẩn comment, nhắc nhở khách hàng check inbox...</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                  <div class="col text-right">
+                    <button type="button" @click.prevent="clearCache" class="btn btn-warning">Clear Cache</button>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include "admin/components/footer.html" %}
+    <notifications group="notification" position="top right" classes="my-notification" width="300"/>
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="{{ url_for('admin_blueprint.static', filename='assets/js/index.min.js') }}"></script>
+{% endblock javascripts %}

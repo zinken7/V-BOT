@@ -1,0 +1,142 @@
+{% extends "admin/layouts.html" %}
+{% block title %} Tài nguyên {% endblock title %}
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+{% include "admin/components/navigation.html" %}
+<!-- Header -->
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="#">Tài nguyên</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Danh sách tài nguyên</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid mt--6" id="app">
+    <!-- Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card bg-transparent">
+                <!-- Card header -->
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="mb-0">Upload</h3>
+                            <p class="text-sm mb-0">
+                                Chấp nhận các file có phần mở rộng: ".csv, .pdf, .png, .jpg, .jpeg, .gif, .mp4"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <div class="dropzone dropzone-multiple dz-clickable" @click.prevent="handleClickFiles">
+                                <ul class="dz-preview dz-preview-multiple list-group list-group-lg list-group-flush">
+                                </ul>
+                                <div class="dz-default dz-message"><span>Click here to upload</span></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 tab-content pad-all">
+                            <div class="tab-pane">
+                                <input ref="files" type="file" multiple @change="handleFilesUpload" />
+                            </div>
+                            <div class="py-3">
+                                <button class="btn btn-primary" @click.prevent="uploadData">Tải lên</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush list my--3">
+                                    <li v-for="(item, index) in files" :key="item.name"
+                                        class="list-group-item px-0 bg-transparent">
+                                        <div class="row align-items-center">
+                                            <div class="col ml--2">
+                                                <h4 class="mb-0">[[ item.name ]]</h4>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button @click="removePreFile(index)" type="button"
+                                                    class="btn btn-sm btn-primary">Xóa</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="mb-0">Danh sách media:</h3>
+                            <p class="text-sm">Tên file|Attachment ID|Copy|Lấy Attachment ID|Xóa</p>
+                            <div class="card-body beauty-box">
+                                <ul class="list-group list-group-flush list">
+                                    <li v-for="media in listmedias" :key="media.key" class="list-group-item">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h4 class="mb-0">[[ media.key ]]</h4>
+                                            </div>
+                                            <div class="col ml--2">
+                                                <h4 class="mb-0">[[ media.val ]]</h4>
+                                            </div>
+                                            <div @click="copyFbAttr(media.val)" class="col-auto">
+                                                <i class="ni ni-single-copy-04 icon-clipboard"></i>
+                                            </div>
+                                            <div @click="updateData(media.aid)" class="col-auto">
+                                                <i class="ni ni-cloud-upload-96 icon-clipboard"></i>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button @click="removeFile(media.aid)" type="button"
+                                                    class="btn btn-sm btn-primary">Xóa</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="mb-0 mt-3">Danh sách file:</h3>
+                            <p class="text-sm">Tên file|Xóa</p>
+                            <div class="card-body beauty-box">
+                                <ul class="list-group list-group-flush list">
+                                    <li v-for="file in listfiles" :key="file.key" class="list-group-item">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h4 class="mb-0">[[ file.key ]]</h4>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button @click="removeFile(file.aid)" type="button"
+                                                    class="btn btn-sm btn-primary">Xóa</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    {% include "admin/components/footer.html" %}
+    <notifications group="notification" position="top right" classes="my-notification" width="250"/>
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="{{ url_for('admin_blueprint.static', filename='assets/vendor/jquery/dist/jquery.min.js') }}"></script>
+<script src="{{ url_for('admin_blueprint.static', filename='assets/js/asset.min.js') }}"></script>
+{% endblock javascripts %}

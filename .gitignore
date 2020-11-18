@@ -1,0 +1,28 @@
+.git
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# env
+.env
+env
+
+# logs
+*.log
+
+# os x
+.DS_Store
+
+# dependencies
+node_modules
+package-lock.json
+
+# other
+.vscode
+.eslintrc
+
+# Optional eslint cache
+.eslintcache

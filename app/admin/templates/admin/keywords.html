@@ -1,0 +1,129 @@
+{% extends "admin/layouts.html" %}
+{% block title %} Từ khóa {% endblock title %}
+{% block stylesheets %}{% endblock stylesheets %}
+{% block content %}
+{% include "admin/components/navigation.html" %}
+<!-- Header -->
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="#">Từ khóa</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Danh sách từ khóa</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid mt--6" id="app">
+    <!-- Card Limit-->
+    <div class="row">
+        <div class="col">
+            <div class="card card-frame">
+                <!-- Card header -->
+                <div class="card-header bg-secondary">
+                    <div class="row align-items-center">
+                        <div class="col-sm-5">
+                            <h3 class="mb-0">Từ khóa giới hạn</h3>
+                            <p class="text-sm mb-0">
+                                Gõ từ khóa rồi ấn Enter...
+                            </p>
+                        </div>
+                        <div class="col-sm-7 flex-container">
+                            <div class="col-sm-7">
+                                <input v-model="newTagText[0]" 
+                                    class="mag-right form-control form-control-alternative">
+                                <p v-if="errors[0].length" class="text-sm mb-0 mt-2"
+                                    style="color: #f5365c;font-weight: 500;">
+                                    [[ errors[0] ]]
+                                </p>
+                            </div>
+                            <div class="col-sm-5">
+                                <button class="btn btn-primary" @click.prevent="addNewListTag(0)">Danh sách mới</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div v-for="(xl_tag, lkey) in l_tags" :key="xl_tag.name" class="row">
+                        <div class="col">
+                            <div class="card-header">
+                                <label class="form-control-label pad-right" for="basic-url">[[ xl_tag.name ]]</label>
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                    @click="deleteListTag(0, lkey)">
+                                    <span class="btn-inner--text">Xóa danh sách</span>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <vue-tags-input v-model="l_tag[lkey]" :tags="xl_tag.value"
+                                    @tags-changed="newTags => updateTags(newTags, 0, lkey)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Card Unlimited-->
+    <div class="row">
+        <div class="col">
+            <div class="card card-frame">
+                <!-- Card header -->
+                <div class="card-header bg-secondary">
+                    <div class="row align-items-center">
+                        <div class="col-sm-5">
+                            <h3 class="mb-0">Từ khóa không giới hạn</h3>
+                            <p class="text-sm mb-0">
+                                Gõ từ khóa rồi ấn Enter...
+                            </p>
+                        </div>
+                        <div class="col-sm-7 flex-container">
+                            <div class="col-sm-7">
+                                <input v-model="newTagText[1]" 
+                                    class="mag-right form-control form-control-alternative">
+                                <p v-if="errors[1].length > 0" class="text-sm mb-0 mt-2"
+                                    style="color: #f5365c;font-weight: 500;">
+                                    [[ errors[1] ]]
+                                </p>
+                            </div>
+                            <div class="col-sm-5">
+                                <button class="btn btn-primary" @click.prevent="addNewListTag(1)">Danh sách mới</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div v-for="(xu_tag, ukey) in u_tags" :key="xu_tag.name" class="row">
+                        <div class="col">
+                            <div class="card-header">
+                                <label class="form-control-label pad-right" for="basic-url">[[ xu_tag.name ]]</label>
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                    @click="deleteListTag(1, ukey)">
+                                    <span class="btn-inner--text">Xóa danh sách</span>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <vue-tags-input v-model="u_tag[ukey]" :tags="xu_tag.value"
+                                    @tags-changed="newTags => updateTags(newTags, 1, ukey)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    {% include "admin/components/footer.html" %}
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="{{ url_for('admin_blueprint.static', filename='assets/vendor/vue-tags-input/dist/vue-tags-input.js') }}">
+</script>
+<script src="{{ url_for('admin_blueprint.static', filename='assets/js/keyword.min.js') }}"></script>
+{% endblock javascripts %}
