@@ -11,4 +11,4 @@ requests
 requests_toolbelt
 unidecode
 redis
-flask-Caching
+flask-caching
