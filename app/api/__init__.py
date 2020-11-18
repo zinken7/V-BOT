@@ -9,7 +9,7 @@ from flask import Blueprint
 blueprint = Blueprint(
     'api_blueprint',
     __name__,
-    subdomain='api'
+    url_prefix='api'
 )
 
 '''
