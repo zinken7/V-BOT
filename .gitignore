@@ -26,3 +26,5 @@ package-lock.json
 
 # Optional eslint cache
 .eslintcache
+nginx.conf
+myproject.service
