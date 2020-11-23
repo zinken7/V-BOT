@@ -9,7 +9,7 @@ from flask import render_template, request, jsonify, abort, send_file, url_for
 from flask.views import MethodView
 from app import db, cache
 
-from app.models import Customer, Asset, Keyword, Wordbook, Welcome, CommentData, FacebookUser, FacebookPage
+from app.models import Customer, Asset, Keyword, Wordbook, ButtonData, QuickReplies, Welcome, CommentData, FacebookUser, FacebookPage, PersistentMenu
 from app.pypage.token import Token
 from app.pymessenger.page import Page
 
@@ -157,7 +157,7 @@ class WordbookView(MethodView):
                 return jsonify(response)
             except:
                 demo_data = [{
-                    "name": "Default",
+                    "name": "default",
                     "content": [{
                         "stype": "img",
                         "scontent": "Demo thư viện",
@@ -182,6 +182,134 @@ class WordbookView(MethodView):
 
         db.session.commit()
         return jsonify(title="Success! ", message="Cập nhật thư viện thành công", status="success")
+
+# Button
+class ButtonView(MethodView):
+
+    def get(self, id):
+        if id:
+            conn = db_connect()
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM buttons ORDER BY id')
+            rows = cursor.fetchall()
+
+            # Convert query to objects of key-value pairs
+            objects_list = []
+            for row in rows:
+                objects_list.append({"id": row[0], "name": row[1], "u_name": row[2], "val": row[3]})
+            data = objects_list
+            conn.close()
+
+            return jsonify(data)
+        return render_template('admin/buttons.html')
+
+    def post(self, id):
+        if id:
+            data = ButtonData.query.filter_by(id=id).first()
+            if data:
+                input_d = request.get_json()
+                data.name = input_d['name']
+                data.u_name = input_d['u_name']
+                data.val = input_d['val']
+                db.session.commit()
+                return jsonify(title="Success! ", message="Cập nhật mẫu thành công", status="success")
+            else:
+                return jsonify(title="Fail! ", message="Cập nhật mẫu không thành công", status="danger")
+        else:
+            input_d = request.get_json()
+            add_name = input_d['name']
+            add_u_name = input_d['u_name']
+            add_val = []
+            content = ButtonData(add_name, add_u_name, add_val)
+            db.session.add(content)
+            db.session.commit()
+
+            conn = db_connect()
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM buttons ORDER BY id')
+            rows = cursor.fetchall()
+
+            # Convert query to objects of key-value pairs
+            objects_list = []
+            for row in rows:
+                objects_list.append({"id": row[0], "name": row[1], "u_name": row[2], "val": row[3]})
+            data = objects_list
+            conn.close()
+
+            return jsonify(data)
+
+    def delete(self, id):
+        data = ButtonData.query.filter_by(id=id).first()
+        if data:
+            db.session.delete(data)
+            db.session.commit()
+            return jsonify(title="Success! ", message="Đã xóa mẫu", status="success")
+        else:
+            return jsonify(title="Fail! ", message="Load lại trang và thử lại..", status="danger")
+
+# Quick Replies
+class QuickRepliesView(MethodView):
+
+    def get(self, id):
+        if id:
+            conn = db_connect()
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM quickreplies ORDER BY id')
+            rows = cursor.fetchall()
+
+            # Convert query to objects of key-value pairs
+            objects_list = []
+            for row in rows:
+                objects_list.append({"id": row[0], "name": row[1], "u_name": row[2], "val": row[3]})
+            data = objects_list
+            conn.close()
+
+            return jsonify(data)
+        return render_template('admin/quick_replies.html')
+
+    def post(self, id):
+        if id:
+            data = QuickReplies.query.filter_by(id=id).first()
+            if data:
+                input_d = request.get_json()
+                data.name = input_d['name']
+                data.u_name = input_d['u_name']
+                data.val = input_d['val']
+                db.session.commit()
+                return jsonify(title="Success! ", message="Cập nhật mẫu thành công", status="success")
+            else:
+                return jsonify(title="Fail! ", message="Cập nhật mẫu không thành công", status="danger")
+        else:
+            input_d = request.get_json()
+            add_name = input_d['name']
+            add_u_name = input_d['u_name']
+            add_val = []
+            content = QuickReplies(add_name, add_u_name, add_val)
+            db.session.add(content)
+            db.session.commit()
+
+            conn = db_connect()
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM quickreplies ORDER BY id')
+            rows = cursor.fetchall()
+
+            # Convert query to objects of key-value pairs
+            objects_list = []
+            for row in rows:
+                objects_list.append({"id": row[0], "name": row[1], "u_name": row[2], "val": row[3]})
+            data = objects_list
+            conn.close()
+
+            return jsonify(data)
+
+    def delete(self, id):
+        data = QuickReplies.query.filter_by(id=id).first()
+        if data:
+            db.session.delete(data)
+            db.session.commit()
+            return jsonify(title="Success! ", message="Đã xóa mẫu", status="success")
+        else:
+            return jsonify(title="Fail! ", message="Load lại trang và thử lại..", status="danger")
 
 # Assets
 class AssetsView(MethodView):
@@ -286,7 +414,7 @@ class CommentDataView(MethodView):
                 db.session.commit()
                 return jsonify(title="Success! ", message="Cập nhật trả lời thành công", status="success")
             else:
-                return jsonify(title="Fail! ", message="Dữ liệu không thành công", status="danger")
+                return jsonify(title="Fail! ", message="Cập nhật không thành công", status="danger")
         else:
             add_val = ''
             content = CommentData(add_val)
@@ -315,6 +443,119 @@ class CommentDataView(MethodView):
             return jsonify(title="Success! ", message="Đã xóa bình luận", status="success")
         else:
             return jsonify(title="Fail! ", message="Load lại trang và thử lại..", status="danger")
+
+# Persistent Menu
+class PersistentMenuView(MethodView):
+
+    def __init__(self):
+        self.user = FacebookUser.query.first()
+        self.page = Page(self.user.p_token, api_version=config('FB_API_VERSION'))
+
+    def get(self, id):
+        if id:
+            conn = db_connect()
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM per_menus ORDER BY id')
+            rows = cursor.fetchall()
+
+            # Convert query to objects of key-value pairs
+            objects_list = []
+            for row in rows:
+                objects_list.append({"id": row[0], "stype": row[1], "title": row[2], "block": row[3]})
+            data = objects_list
+            conn.close()
+
+            return jsonify(data)
+        else:
+            return render_template('admin/persistent_menu.html')
+
+    def post(self, id):
+        if id:
+            data = PersistentMenu.query.filter_by(id=id).first()
+            if data:
+                input_d = request.get_json()
+
+                data.stype = input_d['stype']
+                data.title = input_d['title']
+                data.block = input_d['block']
+                db.session.commit()
+                return jsonify(title="Success! ", message="Cập nhật menu thành công", status="success")
+            else:
+                return jsonify(title="Fail! ", message="Cập nhật menu không thành công", status="danger")
+        else:
+            stype = 'postback'
+            title = ''
+            block = ''
+            content = PersistentMenu(stype, title, block)
+            db.session.add(content)
+            db.session.commit()
+
+            conn = db_connect()
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM per_menus ORDER BY id')
+            rows = cursor.fetchall()
+
+            # Convert query to objects of key-value pairs
+            objects_list = []
+            for row in rows:
+                objects_list.append({"id": row[0], "stype": row[1], "title": row[2], "block": row[3]})
+            data = objects_list
+            conn.close()
+
+            return jsonify(data)
+
+    def put(self):
+        conn = db_connect()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM per_menus ORDER BY id')
+        rows = cursor.fetchall()
+        conn.close()
+        if len(rows) > 0:
+            payload = []
+            for row in rows:
+                if row[1] == "postback":
+                    payload.append(
+                        {
+                            "type": "postback",
+                            "title": row[2],
+                            "payload": row[3]
+                        }
+                    )
+                else:
+                    payload.append(
+                        {
+                            "type": "web_url",
+                            "title": row[2],
+                            "url": row[3],
+                            "webview_height_ratio": "full"
+                        }
+                    )
+            data = {
+                "persistent_menu": [
+                    {
+                        "locale": "default",
+                        "composer_input_disabled": False,
+                        "call_to_actions": payload
+                    }
+                ]
+            }
+            self.page.set_persistent_menu(data)
+            return jsonify(title="Success! ", message="Đăng ký Persistent Menu thành công", status="success")
+        else:
+            return jsonify(title="Fail! ", message="Cần có ít nhất 1 menu..", status="danger")
+
+    def delete(self, id):
+        if id:
+            data = PersistentMenu.query.filter_by(id=id).first()
+            if data:
+                db.session.delete(data)
+                db.session.commit()
+                return jsonify(title="Success! ", message="Đã xóa menu!", status="success")
+            else:
+                return jsonify(title="Fail! ", message="Load lại trang và thử lại..", status="danger")
+        else:
+            self.page.remove_persistent_menu()
+            return jsonify(title="Success! ", message="Hủy đăng ký thành công", status="success")
 
 # Setting
 class SettingView(MethodView):
@@ -404,8 +645,29 @@ class SettingView(MethodView):
         db.session.commit()
 
         # register app
+        callback_url = request.url_root + url_for('api_blueprint.facebook')
+        self.token.register_app_fields(callback_url, self.user.verify_token, 'feed,messages,messaging_postbacks,message_reads')
+        # welcome data
+        welcome = Welcome.query.first()
+        welcome_data = welcome.value
+        if '@@' in welcome_data:
+            get_cmt_arr = welcome_data.split("@@")
+            reply_data = get_cmt_arr[0]+"{{user_full_name}}"+get_cmt_arr[1]
+        else:
+            reply_data = welcome_data
+        get_started = {
+            "get_started": {
+                "payload": "get_started"
+            },
+            "greeting": [
+                {
+                    "locale": "default",
+                    "text": reply_data
+                }
+            ]
+        }
         our_page = Page(page_token, api_version=config('FB_API_VERSION'))
-        our_page.register_app_fields(page_id, 'feed,messages,messaging_postbacks,messaging_optins,message_deliveries,message_reads,messaging_payments,messaging_pre_checkouts,messaging_checkout_updates,messaging_account_linking,messaging_referrals,message_echoes,messaging_game_plays,standby,messaging_handovers,messaging_policy_enforcement,message_reactions,inbox_labels')
+        our_page.set_get_started(get_started)
 
         # return page list
         conn = db_connect()
@@ -427,8 +689,11 @@ class SettingView(MethodView):
     def delete(self):
         # clean page & reset page token
         FacebookPage.query.delete()
+        self.user.u_token = None
+        self.user.p_id = None
         self.user.p_token = None
         db.session.commit()
+        self.token.unregister_app()
         return jsonify([])
 
 # Upload

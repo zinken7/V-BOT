@@ -105,6 +105,40 @@ class Wordbook(db.Model, UserMixin):
     def __repr__(self):
         return str(self.id)
 
+class ButtonData(db.Model, UserMixin):
+
+    __tablename__ = 'buttons'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, )
+    u_name = Column(String, unique=True)
+    val = Column(JSON, )
+
+    def __init__(self, name, u_name, val):
+        self.name = name
+        self.u_name = u_name
+        self.val = val
+
+    def __repr__(self):
+        return str(self.id)
+
+class QuickReplies(db.Model, UserMixin):
+
+    __tablename__ = 'quickreplies'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, )
+    u_name = Column(String, unique=True)
+    val = Column(JSON, )
+
+    def __init__(self, name, u_name, val):
+        self.name = name
+        self.u_name = u_name
+        self.val = val
+
+    def __repr__(self):
+        return str(self.id)
+
 class Welcome(db.Model, UserMixin):
 
     __tablename__ = 'welcomes'
@@ -127,6 +161,23 @@ class CommentData(db.Model, UserMixin):
 
     def __init__(self, value):
         self.value = value
+
+    def __repr__(self):
+        return str(self.id)
+
+class PersistentMenu(db.Model, UserMixin):
+
+    __tablename__ = 'per_menus'
+
+    id = Column(Integer, primary_key=True)
+    stype  = Column(String, )
+    title  = Column(String, )
+    block  = Column(String, )
+
+    def __init__(self, stype, title, block):
+        self.stype = stype
+        self.title = title
+        self.block = block
 
     def __repr__(self):
         return str(self.id)

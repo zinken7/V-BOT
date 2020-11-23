@@ -1,0 +1,92 @@
+{% extends "admin/layouts.html" %}
+{% block title %} Persistent Menu {% endblock title %}
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+{% include "admin/components/navigation.html" %}
+<!-- Header -->
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="#">Persistent Menu</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Danh sách menu</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid mt--6" id="app">
+    <!-- Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header bg-secondary">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="mb-0">Persistent menu</h3>
+                            <p class="text-sm mb-0">
+                                Phần trả lời sẽ dùng các block của thư viện...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div v-for="(val, ind) in menus" :key="val.id" class="row">
+                        <div class="col-sm-6">
+                            <label class="form-control-label pad-right" for="basic-url">Tiêu đề</label>
+                            <div class="form-group pad-all">
+                                <textarea v-model="val.title" @change="updateData(ind)" class="form-control mag-right"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="form-control-label pad-right" for="basic-url">[[ val.stype ]]</label>
+                            <div class="pad-all">
+                                <input v-model="val.block" @change="updateData(ind)" class="form-control">
+                            </div>
+                            <div class="custom-control custom-checkbox text-right">
+                                <input v-model="val.stype" :id="val.id + 'checkbox'"
+                                    @input="$emit('input',$event.target.value)" class="custom-control-input"
+                                    type="checkbox" true-value="web_url" false-value="postback" @change="updateData(ind)">
+                                <label class="custom-control-label" :for="val.id + 'checkbox'">[[ val.stype ]]</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 pad-all">
+                            <button type="button" class="btn btn-danger" @click="deleteMenu(ind, val.id)">
+                                <span class="btn-inner--text">Xóa</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-icon btn-block btn-secondary" type="button" @click="addNewMenu">
+                        <span class="btn-inner--icon"><i class="ni ni-fat-add"></i></span>
+                        <span class="btn-inner--text">Thêm bình luận</span>
+                    </button>
+                </div>
+                <div class="card-footer bg-secondary text-right">
+                    <button @click.prevent="registerData" class="btn btn-icon btn-info" type="button">
+                        <span class="btn-inner--icon"><i class="ni ni-check-bold"></i></span>
+                        <span class="btn-inner--text">Đăng ký Persistent Menu</span>
+                    </button>
+                    <button @click.prevent="unregisterData" class="btn btn-icon btn-default" type="button">
+                        <span class="btn-inner--icon"><i class="ni ni-user-run"></i></span>
+                        <span class="btn-inner--text">Hủy đăng ký</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    {% include "admin/components/footer.html" %}
+    <notifications group="notification" position="top right" classes="my-notification" width="250" />
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="{{ url_for('admin_blueprint.static', filename='assets/js/persistent_menu.min.js') }}"></script>
+{% endblock javascripts %}

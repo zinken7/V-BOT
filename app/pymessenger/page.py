@@ -120,12 +120,68 @@ class Page:
         result = response.json()
         return result
 
-    def register_app_fields(self, page_id, app_fields):
-        request_endpoint = '{0}/{1}/subscribed_apps'.format(self.graph_url, page_id)
+    def set_get_started(self, gs_obj):
+        """Set a get started button shown on welcome screen for first time users
+        https://developers.facebook.com/docs/messenger-platform/reference/messenger-profile-api/get-started-button
+        Input:
+          gs_obj: Your formatted get_started object as described by the API docs
+        Output:
+          Response from API as <dict>
+        """
+        request_endpoint = '{0}/me/messenger_profile'.format(self.graph_url)
         response = requests.post(
             request_endpoint,
-            params=self.auth_args,
-            json={'subscribed_fields': app_fields}
+            params = self.auth_args,
+            json = gs_obj
         )
         result = response.json()
         return result
+
+    def set_persistent_menu(self, pm_obj):
+        """Set a persistent_menu that stays same for every user. Before you can use this, make sure to have set a get started button.
+        https://developers.facebook.com/docs/messenger-platform/reference/messenger-profile-api/persistent-menu
+        Input:
+          pm_obj: Your formatted persistent menu object as described by the API docs
+        Output:
+          Response from API as <dict>
+        """
+        request_endpoint = '{0}/me/messenger_profile'.format(self.graph_url)
+        response = requests.post(
+            request_endpoint,
+            params = self.auth_args,
+            json = pm_obj
+        )
+        result = response.json()
+        return result
+
+    def remove_get_started(self):
+            """delete get started button.
+            https://developers.facebook.com/docs/messenger-platform/reference/messenger-profile-api/#delete
+            Output:
+            Response from API as <dict>
+            """
+            delete_obj = {"fields": ["get_started"]}
+            request_endpoint = '{0}/me/messenger_profile'.format(self.graph_url)
+            response = requests.delete(
+                request_endpoint,
+                params = self.auth_args,
+                json = delete_obj
+            )
+            result = response.json()
+            return result
+
+    def remove_persistent_menu(self):
+            """delete persistent menu.
+            https://developers.facebook.com/docs/messenger-platform/reference/messenger-profile-api/#delete
+            Output:
+            Response from API as <dict>
+            """
+            delete_obj = {"fields": ["persistent_menu"]}
+            request_endpoint = '{0}/me/messenger_profile'.format(self.graph_url)
+            response = requests.delete(
+                request_endpoint,
+                params = self.auth_args,
+                json = delete_obj
+            )
+            result = response.json()
+            return result

@@ -9,7 +9,7 @@ from flask import request
 from flask.views import MethodView
 from app import db, cache
 
-from app.models import FacebookUser, Customer, Keyword, Wordbook, Welcome, CommentData
+from app.models import FacebookUser, Keyword, Wordbook, Welcome
 
 from app.pymessenger.bot import Bot
 from app.pymessenger.page import Page
@@ -32,7 +32,7 @@ class ReceiveWebhook(MethodView):
         self.page = Page(self.master.p_token,
                          api_version=config('FB_API_VERSION'))
         self.VERIFY_TOKEN = self.master.verify_token
-        self.welcome, self.limitdict, self.unlimitdict, self.wordbooks, self.comment = get_res_data()
+        self.welcome, self.limitdict, self.unlimitdict, self.wordbooks, self.comment, self.buttons, self.quickreplies = get_res_data()
         get_customer()
 
     def get(self):
@@ -47,7 +47,7 @@ class ReceiveWebhook(MethodView):
             if "changes" in event:
                 feeds = event['changes']
                 for feed in feeds:
-                    if feed.get('field')=="feed" and feed['value'].get('item')=="comment" and feed['value'].get('verb')=="add":
+                    if feed.get('field') == "feed" and feed['value'].get('item') == "comment" and feed['value'].get('verb') == "add":
                         comment_id = feed['value'].get('comment_id')
                         sender_id = feed['value']['from'].get('id')
                         sender_name = feed['value']['from'].get('name')
@@ -56,29 +56,76 @@ class ReceiveWebhook(MethodView):
                                 # hide comment
                                 self.page.page_hide_comment(comment_id)
                             else:
-                                reply_message(self.page, comment_id, sender_id, sender_name, self.welcome, self.comment)
+                                reply_comment(
+                                    self.page, comment_id, sender_id, sender_name, self.welcome, self.comment)
 
             elif "messaging" in event:
                 messaging = event['messaging']
                 for message in messaging:
                     if message.get('message'):
                         sender_id = message['sender']['id']
+                        _sender_id = 'c'+sender_id
                         text = message['message'].get('text')
                         attachments = message['message'].get('attachments')
+                        quick_reply = message['message'].get('quick_reply')
+                        if quick_reply:
+                            payload = quick_reply.get('payload')
+                            if payload:
+                                reply_payload(self.bot, sender_id, payload, self.wordbooks, self.welcome, self.buttons, self.quickreplies)
+                            continue
+                        if attachments:
+                            text = 'default'
                         if text:
-                            send_response(self.bot, sender_id,
-                                          unidecode(text).lower(), self.limitdict, self.unlimitdict, self.wordbooks, self.welcome)
-                        elif attachments:
-                            send_response(self.bot, sender_id, 'default', self.limitdict, self.unlimitdict, self.wordbooks, self.welcome)
+                            if cache.get(_sender_id) is None or cache.get(_sender_id) != text:
+                                cache.set(_sender_id, text, timeout=120)
+                                reply_message(self.bot, sender_id,
+                                              unidecode(text).lower(), self.limitdict, self.unlimitdict, self.wordbooks, self.welcome, self.buttons, self.quickreplies)
+                    elif message.get('postback'):
+                        sender_id = message['sender']['id']
+                        _sender_id = 'p'+sender_id
+                        payload = message['postback'].get('payload')
+                        if payload:
+                            if cache.get(_sender_id) is None or cache.get(_sender_id) != payload:
+                                cache.set(_sender_id, payload, timeout=120)
+                                reply_payload(self.bot, sender_id, payload, self.wordbooks, self.welcome, self.buttons, self.quickreplies)
         return "Message Processed", 200
 
+# Reply payload
+def reply_payload(bot, sender_id, payload, wordbooks, welcome, buttons, quickreplies):
+    if payload == 'get_started':
+        # luu khach vao cache
+        uid = sender_id
+        triggered = False
+        cache.set(uid, triggered, timeout=0)
+
+        # Gui loi chao
+        user_info = bot.get_user_info(sender_id)
+        fullname = user_info['first_name'] + " " + user_info['last_name']
+        get_mes = welcome
+        get_mes_arr = get_mes.split("@@")
+        welcome_mes = get_mes_arr[0]+fullname+get_mes_arr[1]
+        bot.send_text_message(sender_id, welcome_mes)
+
+        # Luu khach hang
+        customer = Customer.query.filter_by(uid=sender_id).first()
+        if not customer:
+            content = Customer(uid, triggered)
+            db.session.add(content)
+            db.session.commit()
+        else:
+            customer.uid = sender_id
+            customer.triggered = triggered
+            db.session.commit()
+    else:
+        send_data(bot, sender_id, payload, wordbooks, buttons, quickreplies)
+
 # Reply comment and message
-def reply_message(page, comment_id, sender_id, sender_name, welcome, comment):
+def reply_comment(page, comment_id, sender_id, sender_name, welcome, comment):
     # luu khach vao cache
     uid = sender_id
     triggered = False
     cache.set(uid, triggered, timeout=0)
-    
+
     # like
     page.page_like_comment(comment_id)
     # reply comment
@@ -106,7 +153,7 @@ def reply_message(page, comment_id, sender_id, sender_name, welcome, comment):
     return 'success'
 
 # Response incoming message
-def send_response(bot, sender_id, message, litmit_dict, unlitmited_dict, wordbooks, welcome):
+def reply_message(bot, sender_id, message, litmit_dict, unlitmited_dict, wordbooks, welcome, buttons, quickreplies):
     isCustomer = cache.get(sender_id)
     if isCustomer is None:
         # Luu khach hang vao cache truoc
@@ -133,7 +180,7 @@ def send_response(bot, sender_id, message, litmit_dict, unlitmited_dict, wordboo
         if isCustomer:
             choice = check_keyword(unlitmited_dict, message)
             if choice:
-                send_data(bot, sender_id, choice, wordbooks)
+                send_data(bot, sender_id, choice, wordbooks, buttons, quickreplies)
         # chua triggered: limited
         else:
             # luu khach vao cache
@@ -141,7 +188,7 @@ def send_response(bot, sender_id, message, litmit_dict, unlitmited_dict, wordboo
             # tra loi khach
             choice = check_keyword(litmit_dict, message) if check_keyword(
                 litmit_dict, message) else 'default'
-            send_data(bot, sender_id, choice, wordbooks)
+            send_data(bot, sender_id, choice, wordbooks, buttons, quickreplies)
             # set triggered
             customer = Customer.query.filter_by(uid=sender_id).first()
             if customer:
@@ -152,9 +199,12 @@ def send_response(bot, sender_id, message, litmit_dict, unlitmited_dict, wordboo
         return 'success'
 
 # Send data
-def send_data(bot, sender_id, choice, text):
+def send_data(bot, sender_id, choice, text, buttons, quickreplies):
     for item in text[choice]:
         msg_content = item['scontent']
+        if item['stype'] == 'text':
+            bot.send_text_message(sender_id, msg_content)
+            continue
         if item['stype'] == 'img':
             bot.send_action(sender_id, "typing_on")
             bot.send_image(sender_id, msg_content)
@@ -165,7 +215,12 @@ def send_data(bot, sender_id, choice, text):
             bot.send_video(sender_id, msg_content)
             bot.send_action(sender_id, "typing_on")
             continue
-        bot.send_text_message(sender_id, msg_content)
+        if item['stype'] == 'button':
+            bot.send_button_message(sender_id, buttons[msg_content]['text'], buttons[msg_content]['buttons'])
+            continue
+        if item['stype'] == 'quickreplies':
+            bot.send_quick_replies_message(sender_id, quickreplies[msg_content]['text'], quickreplies[msg_content]['quick_replies'])
+            continue
 
 # Check block to response
 def check_keyword(_check, message):
@@ -180,7 +235,9 @@ def check_keyword(_check, message):
 def get_res_data():
     # welcome data
     welcome = Welcome.query.first()
-    welcome_data = welcome.value
+    welcome_data = ''
+    if welcome:
+        welcome_data = welcome.value
     # keyword data
     keyword_data = Keyword.query.first()
     limit = keyword_data.l_dict
@@ -195,21 +252,56 @@ def get_res_data():
     wordbook_list = {}
     for book in books_json:
         wordbook_list[book['name']] = book['content']
-    
-    # comment data
+
+
     conn = db_connect()
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM comments ')
-    rows = cursor.fetchall()
 
-    # Convert query to objects of key-value pairs
+    # comment data
+    cursor.execute('SELECT * FROM comments')
+    rows = cursor.fetchall()
     objects_list = []
     for row in rows:
         objects_list.append(row[1])
     comment_data = objects_list
+    # button data
+    cursor.execute('SELECT * FROM buttons')
+    rows = cursor.fetchall()
+    objects_list = {}
+    for row in rows:
+        bts = []
+        for item in row[3]:
+            bts.append({
+                "type": item['stype'],
+                "title": item['title'],
+                "payload": item['block']
+            })
+        objects_list[row[2]] = {
+            'text': row[1],
+            'buttons': bts
+        }
+    buttons_data = objects_list
+    # quickreplies data
+    cursor.execute('SELECT * FROM quickreplies')
+    rows = cursor.fetchall()
+    objects_list = {}
+    for row in rows:
+        bts = []
+        for item in row[3]:
+            bts.append({
+                "content_type": item['stype'],
+                "title": item['title'],
+                "payload": item['payload'],
+                "image_url": item['image_url']
+            })
+        objects_list[row[2]] = {
+            'text': row[1],
+            'quick_replies': bts
+        }
+    quickreplies_data = objects_list
     conn.close()
 
-    return welcome_data, limitdict, unlimitdict, wordbook_list, comment_data
+    return welcome_data, limitdict, unlimitdict, wordbook_list, comment_data, buttons_data, quickreplies_data
 
 # Get customer data
 def get_customer():

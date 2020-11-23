@@ -9,6 +9,7 @@ class Token:
         self.user_id = kwargs.get('user_id')
         self.api_version = kwargs.get('api_version') or DEFAULT_API_VERSION
         self.app_secret = kwargs.get('app_secret')
+        self.app_token = self.app_id+'|'+self.app_secret
         self.graph_url = 'https://graph.facebook.com/v{0}'.format(self.api_version)
 
     def get_ll_token(self, ushort_token):
@@ -57,3 +58,32 @@ class Token:
         result = response.json()
         return result['data']['is_valid']
     
+    def register_app_fields(self, callback_url, verify_token, app_fields):
+        request_endpoint = '{0}/{1}/subscriptions'.format(self.graph_url, self.app_id)
+        sub_param = {
+            'access_token': self.app_token,
+            'object': 'page',
+            'callback_url': callback_url,
+            'verify_token': verify_token,
+            'fields': app_fields
+        }
+        response = requests.post(
+            request_endpoint,
+            params=sub_param
+        )
+        result = response.json()
+        return result
+    
+    
+    def unregister_app(self):
+        request_endpoint = '{0}/{1}/subscriptions'.format(self.graph_url, self.app_id)
+        sub_param = {
+            'access_token': self.app_token,
+            'object': 'page'
+        }
+        response = requests.delete(
+            request_endpoint,
+            params=sub_param
+        )
+        result = response.json()
+        return result

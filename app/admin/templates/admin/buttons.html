@@ -1,0 +1,103 @@
+{% extends "admin/layouts.html" %}
+{% block title %} Button Template {% endblock title %}
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+{% include "admin/components/navigation.html" %}
+<!-- Header -->
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="#">Button Template</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Danh sách Button Template</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid mt--6" id="app">
+    <!-- Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header bg-secondary">
+                    <div class="row align-items-center">
+                        <div class="col-sm-5">
+                            <h3 class="mb-0">Button Template</h3>
+                            <p class="text-sm mb-0">
+                                Mỗi template tối đa 3 button...
+                            </p>
+                        </div>
+                        <div class="col-sm-7 flex-container">
+                            <div class="col-sm-8">
+                                <input v-model="newTemplateText"
+                                    class="mag-right form-control form-control-alternative">
+                                <p v-if="errors.length" class="text-sm mb-0 mt-2"
+                                    style="color: #f5365c;font-weight: 500;">
+                                    [[ errors[0] ]]
+                                </p>
+                            </div>
+                            <div class="col-sm-4">
+                                <button class="btn btn-primary" @click.prevent="addNewTemplate">Template mới</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div v-for="(template, key) in templates" :key="template.u_name" class="row">
+                        <div class="col">
+                            <div class="card-header">
+                                <label class="form-control-label pad-right" for="basic-url">[[ template.name ]]</label>
+                                <label class="form-control-label pad-right" for="basic-url">[[ template.u_name ]]</label>
+                                <button type="button" class="btn btn-outline-danger btn-sm" @click="deleteTemplate(key, template.id)">
+                                    <span class="btn-inner--text">Xóa template</span>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div v-for="(val, ind) in template.val" :key="ind" class="row">
+                                    <div class="col-sm-6">
+                                        <label class="form-control-label pad-right pl-1" for="basic-url"> Tiêu đề </label>
+                                        <div class="form-group pad-all">
+                                            <input v-model="val.title" @change="updateTemplate(key, template.id)" class="form-control mag-right">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-control-label pad-right pl-1" for="basic-url"> Block</label>
+                                        <div class="form-group pad-all">
+                                            <input v-model="val.block" @change="updateTemplate(key, template.id)" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2 pad-all">
+                                        <button type="button" class="btn btn-danger" @click="deleteButton(key, ind, template.id)">
+                                            <span class="btn-inner--text">Xóa</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-icon btn-block btn-secondary" type="button"
+                                    @click="addNewButton(key, template.id)">
+                                    <span class="btn-inner--icon"><i class="ni ni-fat-add"></i></span>
+                                    <span class="btn-inner--text">Thêm button</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    {% include "admin/components/footer.html" %}
+    <notifications group="notification" position="top right" classes="my-notification" width="250"/>
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="{{ url_for('admin_blueprint.static', filename='assets/js/button.min.js') }}"></script>
+{% endblock javascripts %}

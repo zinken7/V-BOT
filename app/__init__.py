@@ -53,11 +53,31 @@ def configure_logs(app):
     except:
         pass
 
+
+def handler_all_errors(app):
+    # handle all errors before register blueprints
+    @app.errorhandler(401)
+    def access_forbidden(error):
+        return render_template('errors/page_401.html'), 401
+
+    @app.errorhandler(403)
+    def access_forbidden(error):
+        return render_template('errors/page_403.html'), 403
+
+    @app.errorhandler(404)
+    def not_found_error(error):
+        return render_template('errors/page_404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        return render_template('errors/page_500.html'), 500
+
 def create_app(config):
     app = Flask(__name__, subdomain_matching=True, static_folder='static')
     app.config.from_object(config)
     register_extensions(app)
     register_blueprints(app)
     configure_database(app)
+    handler_all_errors(app)
     configure_logs(app)
     return app

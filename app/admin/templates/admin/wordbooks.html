@@ -65,8 +65,8 @@
                                     @start="isDragging = true" @end="isDragging = false" handle=".handle">
                                     <transition-group type="transition" name="flip-list">
                                         <div v-for="(val, ind) in book.content" :key="ind" class="form-group pad-all">
-                                            <div class="handle mag-right" type="button"><i class="fa fa-align-justify"></i></div>
-                                            <div class="mag-right input-group input-group-merge">
+                                            <div class="handle col-auto" type="button"><i class="fa fa-align-justify"></i></div>
+                                            <div class="col wordbook input-group input-group-merge">
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text">[[ ind+1 ]]</span>
                                                 </div>
@@ -74,31 +74,53 @@
                                                     @input="$emit('input',$event.target.value)" type="text"
                                                     class="form-control">
                                             </div>
-                                            <div class="custom-control custom-radio custom-control-inline">
-                                                <input v-model="val.stype" :id="book.name + ind + 'text'"
-                                                    @input="$emit('input',$event.target.value)" value="text"
-                                                    class="custom-control-input" type="radio">
-                                                <label class="custom-control-label"
-                                                    :for="book.name + ind + 'text'">Text</label>
+                                            <div class="col-auto">
+                                                <div>
+                                                    <div class="custom-control custom-radio custom-control-inline">
+                                                        <input v-model="val.stype" :id="book.name + ind + 'text'"
+                                                            @input="$emit('input',$event.target.value)" value="text"
+                                                            class="custom-control-input" type="radio">
+                                                        <label class="custom-control-label"
+                                                            :for="book.name + ind + 'text'">Text</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio custom-control-inline">
+                                                        <input v-model="val.stype" :id="book.name + ind + 'img'"
+                                                            @input="$emit('input',$event.target.value)" value="img"
+                                                            class="custom-control-input" type="radio">
+                                                        <label class="custom-control-label"
+                                                            :for="book.name + ind + 'img'">Image</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio custom-control-inline">
+                                                        <input v-model="val.stype" :id="book.name + ind + 'vds'"
+                                                            @input="$emit('input',$event.target.value)" value="vds"
+                                                            class="custom-control-input" type="radio">
+                                                        <label class="custom-control-label"
+                                                            :for="book.name + ind + 'vds'">Video</label>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="custom-control custom-radio custom-control-inline">
+                                                        <input v-model="val.stype" :id="book.name + ind + 'button'"
+                                                            @input="$emit('input',$event.target.value)" value="button"
+                                                            class="custom-control-input" type="radio">
+                                                        <label class="custom-control-label"
+                                                            :for="book.name + ind + 'button'">Button Template</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio custom-control-inline">
+                                                        <input v-model="val.stype" :id="book.name + ind + 'quickreplies'"
+                                                            @input="$emit('input',$event.target.value)" value="quickreplies"
+                                                            class="custom-control-input" type="radio">
+                                                        <label class="custom-control-label"
+                                                            :for="book.name + ind + 'quickreplies'">Quick Replies</label>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="custom-control custom-radio custom-control-inline">
-                                                <input v-model="val.stype" :id="book.name + ind + 'img'"
-                                                    @input="$emit('input',$event.target.value)" value="img"
-                                                    class="custom-control-input" type="radio">
-                                                <label class="custom-control-label"
-                                                    :for="book.name + ind + 'img'">Image</label>
+                                            <div class="col-auto">
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                    @click="deleteQues(key, ind)">
+                                                    <span class="btn-inner--text">Xóa</span>
+                                                </button>
                                             </div>
-                                            <div class="custom-control custom-radio custom-control-inline">
-                                                <input v-model="val.stype" :id="book.name + ind + 'vds'"
-                                                    @input="$emit('input',$event.target.value)" value="vds"
-                                                    class="custom-control-input" type="radio">
-                                                <label class="custom-control-label"
-                                                    :for="book.name + ind + 'vds'">Video</label>
-                                            </div>
-                                            <button type="button" class="btn btn-danger btn-sm"
-                                                @click="deleteQues(key, ind)">
-                                                <span class="btn-inner--text">Xóa</span>
-                                            </button>
                                         </div>
                                     </transition-group>
                                 </draggable>
