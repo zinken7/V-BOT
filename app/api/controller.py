@@ -9,7 +9,7 @@ from flask import request
 from flask.views import MethodView
 from app import db, cache
 
-from app.models import FacebookUser, Keyword, Wordbook, Welcome
+from app.models import FacebookUser, Customer, Keyword, Wordbook, Welcome
 
 from app.pymessenger.bot import Bot
 from app.pymessenger.page import Page
