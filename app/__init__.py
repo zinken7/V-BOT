@@ -53,7 +53,6 @@ def configure_logs(app):
     except:
         pass
 
-
 def handler_all_errors(app):
     # handle all errors before register blueprints
     @app.errorhandler(401)
