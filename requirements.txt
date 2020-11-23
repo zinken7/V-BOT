@@ -5,6 +5,7 @@ flask_wtf
 email_validator
 flask_sqlalchemy
 python-decouple
+python-dotenv
 gunicorn
 psycopg2
 requests
