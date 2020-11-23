@@ -645,7 +645,7 @@ class SettingView(MethodView):
         db.session.commit()
 
         # register app
-        callback_url = request.url_root + url_for('api_blueprint.facebook')
+        callback_url = request.url_root[:-1] + url_for('api_blueprint.facebook')
         self.token.register_app_fields(callback_url, self.user.verify_token, 'feed,messages,messaging_postbacks,message_reads')
         # welcome data
         welcome = Welcome.query.first()
