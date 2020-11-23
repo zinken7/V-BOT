@@ -563,7 +563,7 @@ class SettingView(MethodView):
     def __init__(self):
         self.user = FacebookUser.query.first()
         self.token = Token(self.user.app_id, user_id=self.user.uid,
-                           app_secret=self.user.app_secret)
+                           app_secret=self.user.app_secret, api_version=config('FB_API_VERSION'))
 
     def get(self, id):
         if id:
