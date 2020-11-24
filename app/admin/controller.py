@@ -596,7 +596,18 @@ class SettingView(MethodView):
         db.session.commit()
 
         # lay danh sach page
-        listpages = self.token.get_page(self.user.u_token)
+        try_times = 0
+        while try_times > 3:
+            try:
+                listpages = self.token.get_page(self.user.u_token)
+                # register app
+                callback_url = request.url_root[:-1] + \
+                    url_for('api_blueprint.facebook')
+                self.token.register_app_fields(
+                    callback_url, self.user.verify_token, 'feed,messages,messaging_postbacks,message_reads')
+                break
+            except:
+                try_times += 1
         for page in listpages:
             uid = page['id']
             if not FacebookPage.query.filter_by(uid=uid).first():
@@ -644,9 +655,6 @@ class SettingView(MethodView):
         page_selected.selected = True
         db.session.commit()
 
-        # register app
-        callback_url = request.url_root[:-1] + url_for('api_blueprint.facebook')
-        self.token.register_app_fields(callback_url, self.user.verify_token, 'feed,messages,messaging_postbacks,message_reads')
         # welcome data
         welcome = Welcome.query.first()
         welcome_data = welcome.value
