@@ -597,7 +597,7 @@ class SettingView(MethodView):
 
         # lay danh sach page
         try_times = 0
-        while try_times > 3:
+        while try_times < 3:
             try:
                 listpages = self.token.get_page(self.user.u_token)
                 # register app
