@@ -55,6 +55,9 @@
                             <button @click="getListPage" type="button" class="btn btn-sm btn-outline-info">Lấy danh sách
                                 Page</button>
                             <button @click="deletePage" type="button" class="btn btn-sm btn-outline-danger">Reset thông tin trang</button>
+                            <div v-if="loading.length" class="fa-x pl-3">
+                                <i class="fas fa-circle-notch fa-spin"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="row">

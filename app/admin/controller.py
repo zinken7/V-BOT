@@ -588,36 +588,45 @@ class SettingView(MethodView):
                 return jsonify([])
         return render_template('admin/settings.html', appID=self.user.app_id, version=config('FB_API_VERSION'))
 
-    def post(self):
-        input_data = request.get_json()
-        # luu user token va user id
-        self.user.u_token = input_data['token']
-        self.user.uid = input_data['uid']
-        db.session.commit()
+    def post(self, id):
+        if id:
+            input_data = request.get_json()
+            if len(input_data) > 0:
+                # check user long-live token va page token de refresh
+                if self.user.u_token:
+                    check_result = self.token.check_token(self.user.u_token, input_data['token'])
+                    if not check_result:
+                        self.user.u_token = self.token.get_ll_token(input_data['token'])
+                        db.session.commit()
+                if self.user.p_token:
+                    check_result = self.token.check_token(self.user.p_token, input_data['token'])
+                    if not check_result:
+                        self.user.p_token = self.token.get_page_token(self.user.u_token, self.token.page_id)
+                        db.session.commit()
+            return 'success'
+        else:
+            input_data = request.get_json()
+            # luu user token va user id
+            self.user.u_token = self.token.get_ll_token(input_data['token'])
+            self.user.uid = input_data['uid']
+            db.session.commit()
 
-        # lay danh sach page
-        try_times = 0
-        while try_times < 3:
-            try:
-                listpages = self.token.get_page(self.user.u_token)
-                # register app
-                callback_url = request.url_root[:-1] + \
-                    url_for('api_blueprint.facebook')
-                self.token.register_app_fields(
-                    callback_url, self.user.verify_token, 'feed,messages,messaging_postbacks,message_reads')
-                break
-            except:
-                try_times += 1
-        for page in listpages:
-            uid = page['id']
-            if not FacebookPage.query.filter_by(uid=uid).first():
-                avatar = page['picture']['data']['url']
-                name = page['name']
-                selected = False
-                # else we can create the customer
-                content = FacebookPage(uid, avatar, name, selected)
-                db.session.add(content)
-                db.session.commit()
+            # lay danh sach page
+            listpages = self.token.get_page(self.user.u_token)
+            # register app
+            callback_url = request.url_root[:-1] + url_for('api_blueprint.facebook')
+            self.token.register_app_fields(
+                callback_url, self.user.verify_token, 'feed,messages,messaging_postbacks,message_reads')
+            for page in listpages:
+                uid = page['id']
+                if not FacebookPage.query.filter_by(uid=uid).first():
+                    avatar = page['picture']['data']['url']
+                    name = page['name']
+                    selected = False
+                    # else we can create the customer
+                    content = FacebookPage(uid, avatar, name, selected)
+                    db.session.add(content)
+                    db.session.commit()
 
         # tra ve danh sach page
         try:
@@ -642,15 +651,17 @@ class SettingView(MethodView):
 
     def put(self, id):
         page_id = id
-        # longlived token
-        ll_token = self.token.get_ll_token(self.user.u_token)
         # page token
-        page_token = self.token.get_page_token(ll_token, page_id)
+        page_token = self.token.get_page_token(self.user.u_token, page_id)
 
         # save data to facebook user
         self.user.p_id = page_id
         self.user.p_token = page_token
 
+        #remove page status
+        FacebookPage.query.update(dict(selected = False))
+
+        # set status
         page_selected = FacebookPage.query.filter_by(uid=page_id).first()
         page_selected.selected = True
         db.session.commit()
@@ -680,7 +691,7 @@ class SettingView(MethodView):
         # return page list
         conn = db_connect()
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM facebookpages')
+        cursor.execute('SELECT * FROM facebookpages ORDER BY "id"')
         rows = cursor.fetchall()
 
         # Convert query to objects of key-value pairs

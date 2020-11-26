@@ -66,9 +66,9 @@ blueprint.add_url_rule('/persistent-menu/<id>', methods=['GET', 'POST', 'DELETE'
 
 # Setting View
 setting_view = SettingView.as_view('settings')
-blueprint.add_url_rule('/settings', methods=['POST', 'DELETE'], view_func=setting_view)
-blueprint.add_url_rule('/settings', methods=['GET'], defaults={'id' : None}, view_func=setting_view)
-blueprint.add_url_rule('/settings/<id>', methods=['GET', 'PUT'], view_func=setting_view)
+blueprint.add_url_rule('/settings', methods=['DELETE'], view_func=setting_view)
+blueprint.add_url_rule('/settings', methods=['GET', 'POST'], defaults={'id' : None}, view_func=setting_view)
+blueprint.add_url_rule('/settings/<id>', methods=['GET', 'POST', 'PUT'], view_func=setting_view)
 
 ## Auth Api
 # Upload files
