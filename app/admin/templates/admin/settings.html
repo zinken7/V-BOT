@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-sm-4 pad-all">
                             <v-facebook-login app-id="{{ appID | safe }}" version="v{{ version | safe }}" :login-options="lgoptions"
-                                v-model="model" @sdk-init="handleSdkInit" style="cursor: pointer;">
+                                v-model="model" @sdk-init="handleSdkInit" @login="handleLogin" style="cursor: pointer;">
                             </v-facebook-login>
                         </div>
                     </div>

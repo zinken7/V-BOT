@@ -60,11 +60,11 @@ class Token:
             except:
                 try_times += 1
 
-    def check_token(self, check_token, real_token):
+    def check_token(self, check_token):
         request_endpoint = '{0}/debug_token'.format(self.graph_url)
         auth_pr = {
             'input_token': check_token,
-            'access_token': real_token
+            'access_token': self.app_token
         }
         try_times = 0
         while try_times < 3:

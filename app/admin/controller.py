@@ -594,27 +594,27 @@ class SettingView(MethodView):
             if len(input_data) > 0:
                 # check user long-live token va page token de refresh
                 if self.user.u_token:
-                    check_result = self.token.check_token(self.user.u_token, input_data['token'])
+                    check_result = self.token.check_token(self.user.u_token)
                     if not check_result:
-                        self.user.u_token = self.token.get_ll_token(input_data['token'])
-                        db.session.commit()
+                        self.user.u_token = self.token.get_ll_token(
+                            input_data['token'])
+                else:
+                    self.user.u_token = self.token.get_ll_token(
+                        input_data['token'])
                 if self.user.p_token:
-                    check_result = self.token.check_token(self.user.p_token, input_data['token'])
+                    check_result = self.token.check_token(self.user.p_token)
                     if not check_result:
-                        self.user.p_token = self.token.get_page_token(self.user.u_token, self.token.page_id)
-                        db.session.commit()
-            return 'success'
-        else:
-            input_data = request.get_json()
-            # luu user token va user id
-            self.user.u_token = self.token.get_ll_token(input_data['token'])
+                        self.user.p_token = self.token.get_page_token(
+                            self.user.u_token, self.user.p_id)
             self.user.uid = input_data['uid']
             db.session.commit()
-
+            return 'success'
+        else:
             # lay danh sach page
             listpages = self.token.get_page(self.user.u_token)
             # register app
-            callback_url = request.url_root[:-1] + url_for('api_blueprint.facebook')
+            callback_url = request.url_root[:-1] + \
+                url_for('api_blueprint.facebook')
             self.token.register_app_fields(
                 callback_url, self.user.verify_token, 'feed,messages,messaging_postbacks,message_reads')
             for page in listpages:
@@ -628,26 +628,26 @@ class SettingView(MethodView):
                     db.session.add(content)
                     db.session.commit()
 
-        # tra ve danh sach page
-        try:
-            # return page list
-            conn = db_connect()
-            cursor = conn.cursor()
-            cursor.execute('SELECT * FROM facebookpages')
-            rows = cursor.fetchall()
+            # tra ve danh sach page
+            try:
+                # return page list
+                conn = db_connect()
+                cursor = conn.cursor()
+                cursor.execute('SELECT * FROM facebookpages')
+                rows = cursor.fetchall()
 
-            # Convert query to objects of key-value pairs
-            objects_list = []
-            for row in rows:
-                objects_list.append(
-                    {"uid": row[1], "avatar": row[2], "name": row[3], "selected": row[4]})
+                # Convert query to objects of key-value pairs
+                objects_list = []
+                for row in rows:
+                    objects_list.append(
+                        {"uid": row[1], "avatar": row[2], "name": row[3], "selected": row[4]})
 
-            data = objects_list
-            conn.close()
+                data = objects_list
+                conn.close()
 
-            return jsonify(data)
-        except:
-            return jsonify([])
+                return jsonify(data)
+            except:
+                return jsonify([])
 
     def put(self, id):
         page_id = id
