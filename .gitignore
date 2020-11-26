@@ -23,6 +23,7 @@ package-lock.json
 # other
 .vscode
 .eslintrc
+.keep
 
 # Optional eslint cache
 .eslintcache
