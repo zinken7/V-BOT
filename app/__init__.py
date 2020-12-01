@@ -9,7 +9,7 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_caching import Cache
 from importlib import import_module
-from logging import basicConfig, DEBUG, getLogger, StreamHandler
+from logging import basicConfig, ERROR, getLogger, StreamHandler
 from os import path
 from decouple import config
 
