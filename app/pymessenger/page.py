@@ -155,33 +155,52 @@ class Page:
         return result
 
     def remove_get_started(self):
-            """delete get started button.
+        """delete get started button.
             https://developers.facebook.com/docs/messenger-platform/reference/messenger-profile-api/#delete
             Output:
             Response from API as <dict>
             """
-            delete_obj = {"fields": ["get_started"]}
-            request_endpoint = '{0}/me/messenger_profile'.format(self.graph_url)
-            response = requests.delete(
-                request_endpoint,
-                params = self.auth_args,
-                json = delete_obj
-            )
-            result = response.json()
-            return result
+        delete_obj = {"fields": ["get_started"]}
+        request_endpoint = '{0}/me/messenger_profile'.format(
+            self.graph_url)
+        response = requests.delete(
+            request_endpoint,
+            params=self.auth_args,
+            json=delete_obj
+        )
+        result = response.json()
+        return result
 
     def remove_persistent_menu(self):
-            """delete persistent menu.
+        """delete persistent menu.
             https://developers.facebook.com/docs/messenger-platform/reference/messenger-profile-api/#delete
             Output:
             Response from API as <dict>
             """
-            delete_obj = {"fields": ["persistent_menu"]}
-            request_endpoint = '{0}/me/messenger_profile'.format(self.graph_url)
-            response = requests.delete(
-                request_endpoint,
-                params = self.auth_args,
-                json = delete_obj
-            )
-            result = response.json()
-            return result
+        delete_obj = {"fields": ["persistent_menu"]}
+        request_endpoint = '{0}/me/messenger_profile'.format(
+            self.graph_url)
+        response = requests.delete(
+            request_endpoint,
+            params=self.auth_args,
+            json=delete_obj
+        )
+        result = response.json()
+        return result
+
+    def register_page_to_app(self, page_id, fields):
+        """register a page to app.
+            https://developers.facebook.com/docs/graph-api/reference/page/subscribed_apps/#Creating
+            Output:
+            Response from API as <dict>
+            """
+        request_endpoint = '{0}/{1}/subscribed_apps'.format(
+            self.graph_url, page_id)
+        pm_obj = {"subscribed_fields": fields}
+        response = requests.post(
+            request_endpoint,
+            params=self.auth_args,
+            json=pm_obj
+        )
+        result = response.json()
+        return result

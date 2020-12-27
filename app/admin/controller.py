@@ -686,6 +686,7 @@ class SettingView(MethodView):
             ]
         }
         our_page = Page(page_token, api_version=config('FB_API_VERSION'))
+        our_page.register_page_to_app(page_id, 'feed,messages,messaging_postbacks,message_reads')
         our_page.set_get_started(get_started)
 
         # return page list
