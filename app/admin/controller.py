@@ -707,9 +707,10 @@ class SettingView(MethodView):
         return jsonify(data)
 
     def delete(self):
+        if self.user.p_id:
+            self.token.unregister_page_from_app(self.user.p_id)
         # clean page & reset page token
         FacebookPage.query.delete()
-        self.user.u_token = None
         self.user.p_id = None
         self.user.p_token = None
         db.session.commit()

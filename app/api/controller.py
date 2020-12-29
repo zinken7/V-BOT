@@ -27,10 +27,8 @@ class ReceiveWebhook(MethodView):
 
     def __init__(self):
         self.master = FacebookUser.query.first()
-        self.bot = Bot(self.master.p_token,
-                       api_version=config('FB_API_VERSION'))
-        self.page = Page(self.master.p_token,
-                         api_version=config('FB_API_VERSION'))
+        self.bot = Bot(self.master.p_token, app_secret=self.master.app_secret, api_version=config('FB_API_VERSION'))
+        self.page = Page(self.master.p_token, app_secret=self.master.app_secret, api_version=config('FB_API_VERSION'))
         self.VERIFY_TOKEN = self.master.verify_token
         self.welcome, self.limitdict, self.unlimitdict, self.wordbooks, self.comment, self.buttons, self.quickreplies = get_res_data()
         get_customer()

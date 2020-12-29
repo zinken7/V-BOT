@@ -107,3 +107,16 @@ class Token:
         )
         result = response.json()
         return result
+    
+    
+    def unregister_page_from_app(self, page_id):
+        request_endpoint = '{0}/{1}/subscribed_apps'.format(self.graph_url, page_id)
+        sub_param = {
+            'access_token': self.app_token
+        }
+        response = requests.delete(
+            request_endpoint,
+            params=sub_param
+        )
+        result = response.json()
+        return result
