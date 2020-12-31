@@ -127,13 +127,15 @@ def reply_comment(page, comment_id, sender_id, sender_name, welcome, comment):
     # like
     page.page_like_comment(comment_id)
     # reply comment
-    cmt_text = random.choice(comment)
-    if '@@' in cmt_text:
-        get_cmt_arr = cmt_text.split("@@")
-        reply_cmt = get_cmt_arr[0]+sender_name+get_cmt_arr[1]
-    else:
-        reply_cmt = cmt_text
-    page.page_reply_comment(comment_id, reply_cmt)
+    if cache.get("ssreply") is None or not cache.get("ssreply"):
+        cmt_text = random.choice(comment)
+        if '@@' in cmt_text:
+            get_cmt_arr = cmt_text.split("@@")
+            reply_cmt = get_cmt_arr[0]+sender_name+get_cmt_arr[1]
+        else:
+            reply_cmt = cmt_text
+        page.page_reply_comment(comment_id, reply_cmt)
+        cache.set("ssreply", True, timeout=60)
     # hide
     page.page_hide_comment(comment_id)
     # reply private
