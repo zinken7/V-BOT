@@ -20,8 +20,7 @@ cache = Cache(config={
     'CACHE_KEY_PREFIX': 'fcache',
     'CACHE_REDIS_HOST': 'localhost',
     'CACHE_REDIS_PORT': '6379',
-    'CACHE_REDIS_PASSWORD': config('REDIS_PASSWORD'),
-    'CACHE_REDIS_URL': 'redis://localhost:6379'
+    'CACHE_REDIS_PASSWORD': config('REDIS_PASSWORD')
     })
 
 def register_extensions(app):
