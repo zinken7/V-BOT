@@ -216,10 +216,10 @@ def send_data(bot, sender_id, choice, text, buttons, quickreplies):
             bot.send_action(sender_id, "typing_on")
             continue
         if item['stype'] == 'button':
-            bot.send_button_message(sender_id, buttons[msg_content]['text'], buttons[msg_content]['buttons'])
+            bot.send_button_message(sender_id, item['stext'], buttons[msg_content]['buttons'])
             continue
         if item['stype'] == 'quickreplies':
-            bot.send_quick_replies_message(sender_id, quickreplies[msg_content]['text'], quickreplies[msg_content]['quick_replies'])
+            bot.send_quick_replies_message(sender_id, item['stext'], quickreplies[msg_content]['quick_replies'])
             continue
 
 # Check block to response
@@ -252,8 +252,15 @@ def get_res_data():
     wordbook_list = {}
     for book in books_json:
         wordbook_list[book['name']] = book['content']
-
-
+    for items in wordbook_list.values():
+        i = 0
+        while i < len(items):
+            if items[i]['stype'] == 'quickreplies' or items[i]['stype'] == 'button':
+                items[i]['stext'] = items[i-1]['scontent']
+                # xoa gi tri truoc
+                i-=1
+                del items[i]
+            i+=1
     conn = db_connect()
     cursor = conn.cursor()
 
