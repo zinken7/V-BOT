@@ -73,8 +73,12 @@ class Token:
                     request_endpoint,
                     params=auth_pr
                 )
-                result = response.json()
-                return result['data']['is_valid']
+                res = response.json()
+                result = {
+                    'is_valid': res['data']['is_valid'],
+                    'uid': res['data']['user_id']
+                }
+                return result
             except:
                 try_times += 1
 

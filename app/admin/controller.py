@@ -595,7 +595,7 @@ class SettingView(MethodView):
                 # check user long-live token va page token de refresh
                 if self.user.u_token:
                     check_result = self.token.check_token(self.user.u_token)
-                    if not check_result:
+                    if not check_result['is_valid'] or check_result['uid'] != input_data['uid']:
                         self.user.u_token = self.token.get_ll_token(
                             input_data['token'])
                 else:
