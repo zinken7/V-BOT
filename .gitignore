@@ -26,5 +26,8 @@ package-lock.json
 
 # Optional eslint cache
 .eslintcache
+
+# Custom
 nginx.conf
 myproject.service
+autogitpush.sh
