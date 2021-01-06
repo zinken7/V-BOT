@@ -155,46 +155,31 @@ def reply_comment(page, comment_id, sender_id, sender_name, welcome, comment):
 # Response incoming message
 def reply_message(bot, sender_id, message, litmit_dict, unlitmited_dict, wordbooks, welcome, buttons, quickreplies):
     isCustomer = cache.get(sender_id)
-    if isCustomer is None:
-        # Luu khach hang vao cache truoc
-        uid = sender_id
-        triggered = False
-        cache.set(uid, triggered, timeout=0)
-        # Gui loi chao
-        user_info = bot.get_user_info(sender_id)
-        fullname = user_info['first_name'] + " " + user_info['last_name']
-        get_mes = welcome
-        get_mes_arr = get_mes.split("@@")
-        welcome_mes = get_mes_arr[0]+fullname+get_mes_arr[1]
-        bot.send_text_message(sender_id, welcome_mes)
-        # else we can create the customer
-        customer = Customer.query.filter_by(uid=sender_id).first()
-        if not customer:
-            content = Customer(uid, triggered)
-            db.session.add(content)
-            db.session.commit()
+    # da triggered: unlimmited
+    if isCustomer:
+        choice = check_keyword(unlitmited_dict, message)
+        if choice:
+            send_data(bot, sender_id, choice, wordbooks, buttons, quickreplies)
 
         return 'success'
+    # chua ton tai hoac chua triggered: limited
     else:
-        # da triggered: unlimmited
-        if isCustomer:
-            choice = check_keyword(unlitmited_dict, message)
-            if choice:
-                send_data(bot, sender_id, choice, wordbooks, buttons, quickreplies)
-        # chua triggered: limited
+        # luu khach hang vao cache
+        cache.set(sender_id, True, timeout=0)
+        # tra loi khach
+        choice = check_keyword(litmit_dict, message) if check_keyword(
+            litmit_dict, message) else 'default'
+        send_data(bot, sender_id, choice, wordbooks, buttons, quickreplies)
+        # create the customer and set triggered
+        customer = Customer.query.filter_by(uid=sender_id).first()
+        if customer:
+            customer.uid = sender_id
+            customer.triggered = True
+            db.session.commit()
         else:
-            # luu khach vao cache
-            cache.set(sender_id, True, timeout=0)
-            # tra loi khach
-            choice = check_keyword(litmit_dict, message) if check_keyword(
-                litmit_dict, message) else 'default'
-            send_data(bot, sender_id, choice, wordbooks, buttons, quickreplies)
-            # set triggered
-            customer = Customer.query.filter_by(uid=sender_id).first()
-            if customer:
-                customer.uid = sender_id
-                customer.triggered = True
-                db.session.commit()
+            content = Customer(sender_id, True)
+            db.session.add(content)
+            db.session.commit()
 
         return 'success'
 
